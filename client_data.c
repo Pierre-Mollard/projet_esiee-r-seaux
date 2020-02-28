@@ -15,7 +15,7 @@ int main(){
 	char ch='A';
 
 	//initialiser le socket
-	sockclient = socket(AF_INET, SOCK_STREAM, 0);
+	sockclient = socket(AF_INET, SOCK_DGRAM, 0);
 
 	//definition struct adresse
 	adresse.sin_family = AF_INET;
@@ -23,21 +23,14 @@ int main(){
 	adresse.sin_port = 9734;
 	longueur=sizeof(adresse);
 
-	//connexion
-	resultat = connect(sockclient, (struct sockaddr *)&adresse, longueur);
-	if (resultat == -1) {
-		perror("ERREUR : CLIENT");
-		exit(1);
-	}
-
 	//envoi données
-	write(sockclient, &ch, 1);
+	sendto(sockclient, &ch, 1, 0, (struct sockaddr *)&adresse, longueur);
 	printf("Caractère envoyé par le client = %c\n", ch);
 
 
 
 	//reception données
-	read(sockclient, &ch, 1);
+	recvfrom(sockclient, &ch, 1, 0, (struct sockaddr *)&adresse, &longueur);
 	printf("Caractère reçu par le client = %c\n", ch);
 
 	//fermeture connexion

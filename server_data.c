@@ -16,7 +16,7 @@ int main(){
 	char ch='A';
 
 	//initialiser le socket
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 	//definition struct adresse
 	adresse.sin_family = AF_INET;
 	adresse.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -31,30 +31,27 @@ int main(){
 	}
 
 
-	int nbCo = 2;
-	while(nbCo > 0){
-
-
-		//écoute
-		listen(sockfd, 1);
-		nbCo--;
-
-		//accept
-		sock_resul = accept(sockfd, (struct sockaddr *)&adresse, &longueur);
 
 		//reception données
-		read(sock_resul, &ch, 1);
-		printf("Caractère reçu par le serveur = %c\n", ch);
+		resultat = recvfrom(sockfd, &ch, 1, 0, (struct sockaddr *)&adresse, &longueur);
+		if (resultat == -1) {
+			perror("ERREUR : SERVEUR");
+			exit(1);
+		}
+		printf("Caractère reçu par le serveur = %c (%d)\n", ch, resultat);
 
 		//traitement de donnée
 		ch++;
 
 		//envoi données
-		write(sock_resul, &ch, 1);
-		printf("Caractère envoyé par le serveur = %c\n", ch);
+		resultat = sendto(sockfd, &ch, 1, 0, (struct sockaddr *)&adresse, longueur);
+		if (resultat == -1) {
+			perror("ERREUR : SERVEUR");
+			exit(1);
+		}
+		printf("Caractère envoyé par le serveur = %c (%d)\n", ch, resultat);
 
 
-	}
 
 	//fermeture connexion
 	close(sockfd);
